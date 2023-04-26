@@ -14,7 +14,10 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+AUTH_USER_MODEL = 'reviews.User'
+
 INSTALLED_APPS = [
+    'reviews.apps.ReviewsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
