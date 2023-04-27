@@ -39,7 +39,8 @@ class Title(models.Model):
     genre = models.ManyToManyField(
         Genre, related_name='genres')
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, related_name='categories')
+        Category, on_delete=models.SET_NULL, related_name='categories',
+        null=True)
 
 
 class Review(models.Model):
