@@ -80,7 +80,7 @@ class Command(BaseCommand):
                     ))
                     list_genres.append(genre)
         try:
-            Category.objects.bulk_create(list_genres)
+            Genre.objects.bulk_create(list_genres)
             print('Добавлены записи в таблицу Genres')
         except Exception as error:
             print(f'Ошибка при добавлении в таблицу Genres: {error}')
@@ -153,7 +153,6 @@ class Command(BaseCommand):
                                   "static", "data", "genre_title.csv")
         with open(genres_titles_data, encoding='utf-8') as r_file:
             file_reader = csv.reader(r_file, delimiter=",")
-            # list_genres_titles = []
             for count, row in enumerate(file_reader):
                 if count != 0:
                     title = Title.objects.get(id=row[1])
