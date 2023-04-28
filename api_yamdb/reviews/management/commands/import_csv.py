@@ -23,6 +23,7 @@ class Command(BaseCommand):
         self.reviews_upload()
         self.comments_upload()
         self.genres_titles()
+        self.add_raiting()
 
     def users_upload(self):
         users_data = Path(Path.cwd(), "static", "data", "users.csv")
@@ -158,3 +159,15 @@ class Command(BaseCommand):
                     title = Title.objects.get(id=row[1])
                     genre = Genre.objects.get(id=row[2])
                     title.genre.add(genre)
+
+    def add_raiting(self):
+        titles = Title.objects.all()
+        for title in titles:
+            reviews = Review.objects.filter(title_id=title.id)
+            if len(reviews) != 0:
+                rating = 0
+                for review in reviews:
+                    rating += review.score
+                rating = rating / len(reviews)
+                title.rating = rating
+                title.save()
