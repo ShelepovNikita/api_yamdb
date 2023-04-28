@@ -10,7 +10,7 @@ from reviews.models import (
 )
 
 
-class CategotySerializer(serializers.ModelSerializer):
+class CategorySerializer(serializers.ModelSerializer):
     """Сериализатор для категорий."""
 
     class Meta:
@@ -29,7 +29,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра произведений."""
     genre = GenreSerializer(many=True, read_only=True)
-    category = CategotySerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
     rating = serializers.SerializerMethodField()
 
     class Meta:
