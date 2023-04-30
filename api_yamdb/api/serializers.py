@@ -38,11 +38,12 @@ class TitleSerializer(serializers.ModelSerializer):
         model = Title
 
     def get_rating(self, obj):
-        rating = obj.reviews.aggregate(raiting=Avg('score'))
+        rating = obj.review.aggregate(raiting=Avg('score'))
         return rating.get('score__avg')
 
 
 class TitleNewSerializer(serializers.ModelSerializer):
+    """Сериализатор для новых произведений."""
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
         read_only=True,
@@ -75,7 +76,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 class CommentReadSerializer(serializers.ModelSerializer):
     """Сериализатор просмотра отзывов."""
-    author = serializers.CharField(source="author.username", read_only=True)
+    author = serializers.CharField(source='author.username', read_only=True)
 
     class Meta:
         fields = ('id', 'review', 'text', 'author', 'pub_date')
@@ -83,6 +84,7 @@ class CommentReadSerializer(serializers.ModelSerializer):
 
 
 class CommentWriteSerializer(serializers.ModelSerializer):
+    """Сериализатор для написания отзывов."""
     author = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:

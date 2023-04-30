@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django_filters',
     'api'
 ]
 
@@ -36,8 +37,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'rest_framework.middleware.AuthenticationMiddleware',
-    'rest_framework.middleware.AuthorizationMiddleware',
+    # 'rest_framework.middleware.AuthenticationMiddleware',
+    # 'rest_framework.middleware.AuthorizationMiddleware',
 ]
 
 ROOT_URLCONF = 'api_yamdb.urls'
@@ -113,6 +114,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
+
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 100,
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
