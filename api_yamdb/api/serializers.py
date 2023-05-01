@@ -1,5 +1,10 @@
-from rest_framework import serializers
+import datetime as dt
+
 from django.db.models import Avg
+
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
+
 
 from reviews.models import (
     Category,
@@ -60,6 +65,13 @@ class TitleNewSerializer(serializers.ModelSerializer):
                   'genre', 'category')
         model = Title
 
+    def validate_year_release(self, value):
+        year = dt.date.today().year
+        if not value >= year:
+            raise serializers.ValidationError(
+                'Год выпуска произведения не может быть больше текущего')
+        return value
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     """Сериализатор отзывов"""
@@ -72,6 +84,14 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
         model = Review
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Review.objects.all(),
+                fields=('title', 'author'),
+                message='Пользователь может оставить'
+                        'только один отзыв на произведение. ',
+            )
+        ]
 
 
 class CommentReadSerializer(serializers.ModelSerializer):
