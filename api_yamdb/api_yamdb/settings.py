@@ -26,7 +26,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
     'users.apps.UsersConfig',
+
+    'rest_framework',
+    'django_filters',
+    'api'
+
 ]
 
 MIDDLEWARE = [
@@ -37,6 +43,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'rest_framework.middleware.AuthenticationMiddleware',
+    # 'rest_framework.middleware.AuthorizationMiddleware',
 ]
 
 ROOT_URLCONF = 'api_yamdb.urls'
@@ -108,6 +116,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
+
 AUTH_USER_MODEL = 'user.User'
 
 REST_FRAMEWORK = {
@@ -132,3 +141,14 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 DEFAULT_FROM_EMAIL = 'admin@yamdb.ru'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
