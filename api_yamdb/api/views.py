@@ -17,8 +17,10 @@ from .serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
+    TitleNewSerializer,
     ReviewSerializer,
-    CommentReadSerializer
+    CommentReadSerializer,
+    CommentWriteSerializer
 )
 from .filters import TitleFilter
 from .permissions import (
@@ -54,6 +56,11 @@ class TitleViewsSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     permission_classes = (IsAdminOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return TitleNewSerializer
+        return TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
@@ -91,3 +98,8 @@ class CommentReadViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH']:
+            return CommentWriteSerializer
+        return CommentReadSerializer
