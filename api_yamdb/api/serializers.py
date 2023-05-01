@@ -51,12 +51,10 @@ class TitleNewSerializer(serializers.ModelSerializer):
     """Сериализатор для новых произведений."""
     genre = serializers.SlugRelatedField(
         queryset=Genre.objects.all(),
-        read_only=True,
         slug_field='slug'
     )
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(),
-        read_only=True,
         slug_field='slug'
     )
 
