@@ -5,16 +5,20 @@ from rest_framework import viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import (HTTP_200_OK, HTTP_400_BAD_REQUEST,
-                                   HTTP_401_UNAUTHORIZED)
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED)
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import IsAdmin
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-
-from .models import User
-from .serializers import (SignUpSerializer, TokenSerializer,
-                          UserEditSerializer, UserSerializer)
+from users.permissions import IsAdmin
+from users.models import User
+from users.serializers import (
+    SignUpSerializer,
+    TokenSerializer,
+    UserEditSerializer,
+    UserSerializer)
 
 
 @api_view(['POST'])
@@ -23,13 +27,15 @@ def sign_up(request):
     """Регистрация пользователя"""
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    serializer.save()
-    email = request.POST.get('email')
-    username = request.POST.get('username')
-    user, username = User.objects.get_or_create(
-        email=email,
-        username=username
-    )
+    try:
+        email = serializer.validated_data.get('email')
+        username = serializer.validated_data.get('username')
+        user, _ = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
+    except Exception:
+        return Response('Нет', status=HTTP_400_BAD_REQUEST)
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='Код для получения api-tokena',
