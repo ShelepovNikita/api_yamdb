@@ -1,22 +1,5 @@
-
-from django.contrib.auth.models import AbstractUser
 from django.db import models
-
-
-# Все модели черновые, будут обрастать данными в процессе разработки.
-# Не забывайте делать миграции.
-
-# Модель юзер построена через абстрактюзер по подсказке под заданием яндекса.
-class User(AbstractUser):
-    ROLES = (
-        ('user', 'user'),
-        ('moderator', 'moderator'),
-        ('admin', 'admin'),
-    )
-
-    bio = models.TextField(blank=True,)
-    role = models.CharField(
-        max_length=50, choices=ROLES, blank=True, default='user')
+from users.models import User
 
 
 class Category(models.Model):
@@ -29,13 +12,9 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50, unique=True, null=False)
 
 
-# Здесь хитро сделана таблица, связывающая произведения и жанры.
-# Таблица genre_title из схемы которую я скидывал в телеграмме
-# создается автоматически с помощью поля ManyToManyField
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.IntegerField()
-    rating = models.IntegerField(null=True)
     description = models.TextField()
     genre = models.ManyToManyField(
         Genre, related_name='genres')
