@@ -1,8 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import viewsets, filters
-
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
@@ -13,7 +11,7 @@ from reviews.models import (
     Review,
     Comment
 )
-from .serializers import (
+from api.serializers import (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
@@ -22,37 +20,37 @@ from .serializers import (
     CommentReadSerializer,
     CommentWriteSerializer
 )
-from .filters import TitleFilter
-from .permissions import (
+from api.filters import TitleFilter
+from api.permissions import (
     IsAdminOrReadOnly,
     IsAuthorOrModerOrAdminOrReadOnly)
+from api.viewsets import CreateListDestroyViewSet
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CreateListDestroyViewSet):
     """API для модели категорий."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_classes = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     """API для модели жанров."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_classes = LimitOffsetPagination
-    filter_backends = (filters.SearchFilter)
+    filter_backends = (filters.SearchFilter,)
     search_fields = ('name', )
     permission_classes = (IsAdminOrReadOnly,)
+    lookup_field = 'slug'
 
 
 class TitleViewsSet(viewsets.ModelViewSet):
     """API для модели произведений."""
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    pagination_classes = LimitOffsetPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
     permission_classes = (IsAdminOrReadOnly,)
@@ -65,7 +63,6 @@ class TitleViewsSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """API для модели отзывов."""
-    queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     pagination_classes = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,
@@ -73,7 +70,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         title_id = self.kwargs.get('title_id')
-        serializer.save(author=self.request.user, title_id=title_id)
+        title = Title.objects.get(pk=title_id)
+        serializer.save(author=self.request.user, title=title)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')

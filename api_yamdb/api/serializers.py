@@ -1,10 +1,8 @@
 import datetime as dt
 
 from django.db.models import Avg
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-
 
 from reviews.models import (
     Category,
@@ -21,6 +19,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
         model = Category
+        lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -29,6 +28,7 @@ class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('name', 'slug')
         model = Genre
+        lookup_field = 'slug'
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -38,18 +38,19 @@ class TitleSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description',
-                  'genre', 'category', 'rating')
+        fields = ('id', 'name', 'year', 'rating', 'description',
+                  'genre', 'category')
         model = Title
 
     def get_rating(self, obj):
-        rating = obj.review.aggregate(raiting=Avg('score'))
-        return rating.get('score__avg')
+        if obj.reviews.exists():
+            return obj.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitleNewSerializer(serializers.ModelSerializer):
     """Сериализатор для новых произведений."""
     genre = serializers.SlugRelatedField(
+        many=True,
         queryset=Genre.objects.all(),
         slug_field='slug'
     )
@@ -63,9 +64,9 @@ class TitleNewSerializer(serializers.ModelSerializer):
                   'genre', 'category')
         model = Title
 
-    def validate_year_release(self, value):
+    def validate_year(self, value):
         year = dt.date.today().year
-        if not value >= year:
+        if value > year:
             raise serializers.ValidationError(
                 'Год выпуска произведения не может быть больше текущего')
         return value
@@ -78,6 +79,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
+    title = serializers.HiddenField(default='')
 
     class Meta:
         fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
