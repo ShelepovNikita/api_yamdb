@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -8,10 +9,19 @@ class SignUpSerializer(serializers.ModelSerializer):
     """Сериалайзер для регистрации."""
 
     username = serializers.CharField(
-        max_length=100,
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        validators=(
+            UniqueValidator(queryset=User.objects.all()),
+            RegexValidator(regex=r'^[\w.@+-]',
+                           message='Неверное имя пользователя')
+        ),
+        required=True,
+        max_length=150,
+    )
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+        required=True,
+        max_length=254
+    )
 
     def validate_username(self, value):
         """Проверка на запрещенный username - me."""
@@ -34,29 +44,51 @@ class TokenSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Сериалайзер для модели User."""
-
+    """Сериализатор для работы с пользователями."""
     username = serializers.CharField(
-        max_length=100,
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        validators=(
+            UniqueValidator(queryset=User.objects.all()),
+            RegexValidator(regex=r'^[\w.@+-]',
+                           message='Неверное имя пользователя')
+        ),
+        required=True,
+        max_length=150
+    )
     email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())])
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+        required=True,
+        max_length=254
+    )
 
     class Meta:
-
         model = User
-        fields = ('first_name', 'last_name',
-                  'username', 'bio',
-                  'role', 'email')
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
 
 
 class UserEditSerializer(serializers.ModelSerializer):
-    """Сериалайзер для модели User."""
+    """Сериализатор для работы с личными данными поьзователя."""
+    username = serializers.CharField(
+        validators=(
+            UniqueValidator(queryset=User.objects.all()),
+            RegexValidator(regex=r'^[\w.@+-]',
+                           message='Неверное имя пользователя')
+        ),
+        required=True,
+        max_length=150
+    )
+    email = serializers.EmailField(
+        validators=(UniqueValidator(queryset=User.objects.all()),),
+        required=True,
+        max_length=254
+    )
 
     class Meta:
-
-        fields = ('first_name', 'last_name',
-                  'username', 'bio',
-                  'role', 'email')
         model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
         read_only_fields = ('role',)
