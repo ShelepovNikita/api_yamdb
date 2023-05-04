@@ -17,8 +17,7 @@ from api.serializers import (
     TitleSerializer,
     TitleNewSerializer,
     ReviewSerializer,
-    CommentReadSerializer,
-    CommentWriteSerializer
+    CommentSerializer
 )
 from api.filters import TitleFilter
 from api.permissions import (
@@ -79,10 +78,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
         return review_queryset
 
 
-class CommentReadViewSet(viewsets.ModelViewSet):
+class CommentViewSet(viewsets.ModelViewSet):
     """API для модели комментариев."""
     queryset = Comment.objects.all()
-    serializer_class = CommentReadSerializer
+    serializer_class = CommentSerializer
     pagination_classes = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,
                           IsAuthorOrModerOrAdminOrReadOnly,)
@@ -96,8 +95,3 @@ class CommentReadViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get('review_id')
         review = get_object_or_404(Review, id=review_id)
         serializer.save(author=self.request.user, review=review)
-
-    def get_serializer_class(self):
-        if self.request.method in ['POST', 'PATCH']:
-            return CommentWriteSerializer
-        return CommentReadSerializer

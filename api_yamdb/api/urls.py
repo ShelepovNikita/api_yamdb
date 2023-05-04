@@ -6,7 +6,7 @@ from api.views import (
     GenreViewSet,
     TitleViewsSet,
     ReviewViewSet,
-    CommentReadViewSet,
+    CommentViewSet
 )
 from api_yamdb.settings import VERSION_API
 
@@ -20,7 +20,7 @@ router_v1.register(r'titles/(?P<title_id>\d+)/reviews',
                    )
 router_v1.register(
     r'titles/(?P<title_id>\d+)/reviews/(?P<review_id>\d+)/comments',
-    CommentReadViewSet,
+    CommentViewSet,
     basename='comment'
 )
 

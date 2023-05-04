@@ -1,8 +1,11 @@
 import datetime as dt
 
 from django.db.models import Avg
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import (
     Category,
@@ -79,34 +82,33 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only=True,
         slug_field='username'
     )
-    title = serializers.HiddenField(default='')
+    score = serializers.IntegerField(validators=[
+        MinValueValidator(limit_value=1,
+                          message='Минимальное значение - 1'),
+        MaxValueValidator(limit_value=10,
+                          message='Максимальное значение - 10')
+    ])
+
+    def validate(self, data):
+        if self.context.get('request').method == 'POST':
+            author = self.context.get('request').user
+            title_id = self.context.get('view').kwargs.get('title_id')
+            title = get_object_or_404(Title, id=title_id)
+            if Review.objects.filter(title_id=title.id,
+                                     author=author).exists():
+                raise ValidationError('Вы можете оставить только 1 отзыв')
+        return data
 
     class Meta:
-        fields = ('id', 'title', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Review.objects.all(),
-                fields=('title', 'author'),
-                message='Пользователь может оставить'
-                        'только один отзыв на произведение. ',
-            )
-        ]
 
 
-class CommentReadSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.ModelSerializer):
     """Сериализатор просмотра отзывов."""
-    author = serializers.CharField(source='author.username', read_only=True)
+    author = serializers.SlugRelatedField(slug_field='username',
+                                          read_only=True)
 
     class Meta:
-        fields = ('id', 'review', 'text', 'author', 'pub_date')
-        model = Comment
-
-
-class CommentWriteSerializer(serializers.ModelSerializer):
-    """Сериализатор для написания отзывов."""
-    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
-
-    class Meta:
-        fields = ('id', 'review', 'text', 'author', 'pub_date')
+        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
