@@ -76,7 +76,7 @@ class TitleNewSerializer(serializers.ModelSerializer):
 
 
 class ReviewSerializer(serializers.ModelSerializer):
-    """Сериализатор отзывов"""
+    """Сериализатор отзывов."""
     author = serializers.SlugRelatedField(
         default=serializers.CurrentUserDefault(),
         read_only=True,
@@ -105,7 +105,7 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    """Сериализатор просмотра отзывов."""
+    """Сериализатор комментариев."""
     author = serializers.SlugRelatedField(slug_field='username',
                                           read_only=True)
 
