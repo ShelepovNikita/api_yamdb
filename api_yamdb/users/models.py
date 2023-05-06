@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from users.constaints import EMAIL_LENGTH, USER_FIELDS_LENGTH
+
 
 class User(AbstractUser):
 
@@ -16,7 +18,8 @@ class User(AbstractUser):
         'Биография',
         blank=True,
     )
-    email = models.EmailField(unique=True, blank=False, max_length=254)
+    email = models.EmailField(unique=True, blank=False,
+                              max_length=EMAIL_LENGTH)
     role = models.CharField(
         choices=ROLES,
         default=USER,
@@ -24,10 +27,12 @@ class User(AbstractUser):
     )
     username = models.CharField(
         'Имя пользователя',
-        max_length=100,
+        max_length=USER_FIELDS_LENGTH,
         null=True,
         unique=True
     )
+    first_name = models.CharField(max_length=USER_FIELDS_LENGTH, blank=True)
+    last_name = models.CharField(max_length=USER_FIELDS_LENGTH, blank=True)
 
     @property
     def is_user(self):

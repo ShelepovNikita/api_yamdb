@@ -2,15 +2,14 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, status, viewsets
-from rest_framework import viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from users.permissions import IsAdmin
 from users.models import User
+from users.permissions import IsAdmin
 from users.serializers import (
     SignUpSerializer,
     TokenSerializer,

@@ -1,12 +1,9 @@
-import datetime as dt
-
-from django.db.models import Avg
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
-
 from rest_framework import serializers
 
+from api.validators import validate_year
 from reviews.models import (
     Category,
     Genre,
@@ -38,16 +35,12 @@ class TitleSerializer(serializers.ModelSerializer):
     """Сериализатор для просмотра произведений."""
     genre = GenreSerializer(many=True, read_only=True)
     category = CategorySerializer(read_only=True)
-    rating = serializers.SerializerMethodField()
+    rating = serializers.IntegerField(source='rating_avg')
 
     class Meta:
         fields = ('id', 'name', 'year', 'rating', 'description',
                   'genre', 'category')
         model = Title
-
-    def get_rating(self, obj):
-        if obj.reviews.exists():
-            return obj.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class TitleNewSerializer(serializers.ModelSerializer):
@@ -61,18 +54,12 @@ class TitleNewSerializer(serializers.ModelSerializer):
         queryset=Category.objects.all(),
         slug_field='slug'
     )
+    year = serializers.IntegerField(validators=[validate_year])
 
     class Meta:
         fields = ('id', 'name', 'year', 'description',
                   'genre', 'category')
         model = Title
-
-    def validate_year(self, value):
-        year = dt.date.today().year
-        if value > year:
-            raise serializers.ValidationError(
-                'Год выпуска произведения не может быть больше текущего')
-        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
