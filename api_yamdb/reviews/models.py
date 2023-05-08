@@ -20,14 +20,14 @@ class Сharacteristic(models.Model):
 class Category(Сharacteristic):
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name', )
         verbose_name = "Категория"
 
 
 class Genre(Сharacteristic):
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name', )
         verbose_name = "Жанр"
 
 
@@ -35,7 +35,7 @@ class Title(models.Model):
     name = models.CharField(max_length=NAME_LENGTH,
                             verbose_name='Название')
     year = models.IntegerField(verbose_name='Год',
-                               validators=[validate_year])
+                               validators=(validate_year, ))
     description = models.TextField(verbose_name='Описание')
     genre = models.ManyToManyField(
         Genre, related_name='titles',
@@ -45,7 +45,7 @@ class Title(models.Model):
         null=True, verbose_name='Категория')
 
     class Meta:
-        ordering = ['year']
+        ordering = ('year', )
         verbose_name = "Произведение"
 
 
@@ -57,17 +57,16 @@ class Review(models.Model):
     author = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='reviews',
         verbose_name='Автор отзыва')
-    score = models.IntegerField(verbose_name='Оценка', validators=[
+    score = models.IntegerField(verbose_name='Оценка', validators=(
         MinValueValidator(limit_value=1,
                           message='Минимальное значение - 1'),
         MaxValueValidator(limit_value=10,
-                          message='Максимальное значение - 10')
-    ])
+                          message='Максимальное значение - 10')))
     pub_date = models.DateTimeField(auto_now_add=True,
                                     verbose_name='Дата публикации')
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ('pub_date', )
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
@@ -89,5 +88,5 @@ class Comment(models.Model):
                                     verbose_name='Дата публикации')
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ('pub_date', )
         verbose_name = "Комментарий"

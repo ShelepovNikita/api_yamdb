@@ -39,7 +39,7 @@ Cоздать и активировать виртуальное окружен�
 
 Если у вас windows
 
-    source env/scripts/activate
+    env/scripts/activate.bat
 
 Обновить pip
 

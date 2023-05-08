@@ -8,7 +8,6 @@ from api.views import (
     ReviewViewSet,
     CommentViewSet
 )
-from api_yamdb.settings import VERSION_API
 
 router_v1 = SimpleRouter()
 router_v1.register('categories', CategoryViewSet, basename='category')
@@ -25,5 +24,5 @@ router_v1.register(
 )
 
 urlpatterns = [
-    path(f'{VERSION_API}', include(router_v1.urls)),
+    path('v1/', include(router_v1.urls)),
 ]

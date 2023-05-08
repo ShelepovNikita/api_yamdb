@@ -122,8 +122,6 @@ EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 DEFAULT_FROM_EMAIL = 'admin@yamdb.ru'
 
-VERSION_API = 'v1/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
